@@ -42,8 +42,9 @@ namespace CongestionTaxCalculator.Application.Services.ApplicationServices
                 .Select(s => s.Region.TaxStations.Where(c => c.StationName == receiptTheTaxDTO.TaxStationName).FirstOrDefault())
                 .FirstOrDefault() ?? throw new NotFoundException();
 
+            //Check Receiptable
             var (IsReceiptable, TaxScope) = _lawLimitationTaxReceiptsSterategyHandler
-                .ShouldTaxBeReceiptable(tacRole.TaxScopes, [.. licencePlate.TaxReceipts], receiptTheTaxDTO);
+                .ShouldTaxBeReceiptable(tacRole.TaxScopes, [.. licencePlate.TaxReceipts], taxStation, receiptTheTaxDTO);
 
             if (IsReceiptable && TaxScope != null)
             {

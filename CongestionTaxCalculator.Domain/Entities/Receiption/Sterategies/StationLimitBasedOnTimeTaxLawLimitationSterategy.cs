@@ -1,5 +1,6 @@
 ﻿using CongestionTaxCalculator.Domain.Common.InterfaceDependency;
 using CongestionTaxCalculator.Domain.DTO.Receiption;
+using CongestionTaxCalculator.Domain.Entities.Regions;
 using CongestionTaxCalculator.Domain.Entities.Tax;
 
 namespace CongestionTaxCalculator.Domain.Entities.Receiption.Sterategies
@@ -19,7 +20,7 @@ namespace CongestionTaxCalculator.Domain.Entities.Receiption.Sterategies
          speed and distance between each station was not implemented*/
 
         public (bool IsReceiptable, TaxScope? TaxScope) ShouldTaxBeReceiptable(IEnumerable<TaxScope> taxScopes,
-            IEnumerable<TaxReceipt> TaxsReceipted, ReceiptTheTaxDTO newTaxReceiption)
+            IEnumerable<TaxReceipt> TaxsReceipted, TaxStation taxStation, ReceiptTheTaxDTO newTaxReceiption)
         {
             var arrivalTimeSpan = newTaxReceiption.ArrivalDateTime.TimeOfDay;
             var newTaxScopes = taxScopes.OrderBy(o => o.FromTime).ThenBy(o => o.ToTime).ToList();
@@ -30,6 +31,7 @@ namespace CongestionTaxCalculator.Domain.Entities.Receiption.Sterategies
             var lastReceiptedTheTax = TaxsReceipted.LastOrDefault();
 
             if (TaxsReceipted.Any() && lastReceiptedTheTax != null &&
+                TaxsReceipted.All(a => a.TaxStation.Region.RegionName == taxStation.Region.RegionName) &&
                 lastReceiptedTheTax.ReceiptTime.Date == newTaxReceiption.ArrivalDateTime.Date &&
                 (arrivalTimeSpan - lastReceiptedTheTax.ReceiptTime.TimeOfDay).TotalMinutes <= 60
             )
